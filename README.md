@@ -1,7 +1,10 @@
-# ERC20 Token Contracts: 
-## aITuSe(Assignment 3, part 1) and aITuSeModified(Assignment 3, part 2)
+# ERC20 Token Contracts: aITuSe(Assignment 3, part 1) and aITuSeModified(Assignment 3, part 2)
 
 ## Overview
+- Assignment 3, part 1 & 2 Blockchain Technologies 
+- Group: SE-2321 
+- Students: Nurila Smaiyl, Alinur Zhumadil, Aslan Koishigulov
+
 This project implements two ERC20 token contracts using the OpenZeppelin library:
 1. **aITuSe**: A fixed-supply ERC20 token with 2000 tokens minted at deployment.
 2. **aITuSeModified**: An ERC20 token that allows dynamic initialization of the token supply via a constructor parameter.
