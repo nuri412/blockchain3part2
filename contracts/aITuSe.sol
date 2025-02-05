@@ -67,11 +67,49 @@ contract aITuSe is ERC20 {
         return timestampToHumanReadable(latestTimestamp);
     }
 
-    function timestampToHumanReadable(uint256 timestamp) internal pure returns (string memory) {
-        uint256 year = (timestamp / 31536000) + 1970; 
-        uint256 month = (timestamp % 31536000) / 2628000; 
-        uint256 day = ((timestamp % 31536000) % 2628000) / 86400; 
-        return string(abi.encodePacked("Y:", uintToString(year), " M:", uintToString(month), " D:", uintToString(day)));
+        function timestampToHumanReadable(uint256 timestamp) internal pure returns (string memory) {
+        uint256 constant SECONDS_PER_DAY = 86400;
+        uint256 constant SECONDS_PER_YEAR = 31536000; // 365 days
+        uint256 constant SECONDS_PER_LEAP_YEAR = 31622400; // 366 days
+        uint256 year = 1970;
+        uint256 remainingSeconds = timestamp;
+
+        while (remainingSeconds >= SECONDS_PER_YEAR) {
+            bool isLeapYear = (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0));
+            uint256 secondsInYear = isLeapYear ? SECONDS_PER_LEAP_YEAR : SECONDS_PER_YEAR;
+    
+            if (remainingSeconds < secondsInYear) {
+                break;
+            }
+    
+            remainingSeconds -= secondsInYear;
+            year++;
+        }
+
+        uint256[12] memory monthDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+        if ((year % 4 == 0 && (year % 100 != 0 || year % 400 == 0))) {
+            monthDays[1] = 29; // February in a leap year
+        }
+
+        uint256 month = 0;
+        uint256 day = 0;
+        for (month = 0; month < 12; month++) {
+            uint256 daysInMonth = monthDays[month];
+            uint256 secondsInMonth = daysInMonth * SECONDS_PER_DAY;
+    
+            if (remainingSeconds < secondsInMonth) {
+                day = (remainingSeconds / SECONDS_PER_DAY) + 1; // Day starts at 1
+                break;
+            }
+    
+            remainingSeconds -= secondsInMonth;
+        }
+    
+        return string(abi.encodePacked(
+            "Y:", uintToString(year),
+            " M:", uintToString(month + 1), // Months are 1-indexed
+            " D:", uintToString(day)
+        ));
     }
 
     function uintToString(uint256 value) internal pure returns (string memory) {
