@@ -6,7 +6,6 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 contract aITuSeModified is ERC20 {
     uint256 public initialValue; 
 
-    // Struct to store transaction details
     struct Transaction {
         address sender;
         address receiver;
@@ -14,10 +13,8 @@ contract aITuSeModified is ERC20 {
         uint256 timestamp;
     }
 
-    // Array to store all transactions
     Transaction[] public transactions;
 
-    // Event to log transactions
     event TransferEvent(address indexed sender, address indexed receiver, uint256 amount, uint256 timestamp);
 
     // Constructor now accepts an input parameter
@@ -26,14 +23,12 @@ contract aITuSeModified is ERC20 {
         _mint(msg.sender, _initialValue * 10**decimals()); // Mint tokens based on the initial value
     }
 
-    // Override the transfer function to log transaction details
     function transfer(address recipient, uint256 amount) public override returns (bool) {
         require(recipient != address(0), "ERC20: transfer to the zero address");
         require(amount > 0, "ERC20: transfer amount must be greater than zero");
 
         bool success = super.transfer(recipient, amount);
 
-        // Log the transaction details
         transactions.push(
             Transaction({
                 sender: msg.sender,
@@ -47,7 +42,6 @@ contract aITuSeModified is ERC20 {
         return success;
     }
 
-    // Function to retrieve and display transaction information
     function getTransaction(uint256 index)
         public
         view
@@ -63,14 +57,12 @@ contract aITuSeModified is ERC20 {
         return (txn.sender, txn.receiver, txn.amount, txn.timestamp);
     }
 
-    // Function to return the block timestamp of the latest transaction in human-readable format
     function getLatestTransactionTimestamp() public view returns (string memory) {
         require(transactions.length > 0, "No transactions available");
         uint256 latestTimestamp = transactions[transactions.length - 1].timestamp;
         return timestampToHumanReadable(latestTimestamp);
     }
 
-    // Helper function to convert timestamp to human-readable format
     function timestampToHumanReadable(uint256 timestamp) internal pure returns (string memory) {
         uint256 year = (timestamp / 31536000) + 1970; // Approximate year calculation
         uint256 month = (timestamp % 31536000) / 2628000; // Approximate month calculation
@@ -78,7 +70,6 @@ contract aITuSeModified is ERC20 {
         return string(abi.encodePacked("Y:", uintToString(year), " M:", uintToString(month), " D:", uintToString(day)));
     }
 
-    // Helper function to convert uint to string
     function uintToString(uint256 value) internal pure returns (string memory) {
         if (value == 0) {
             return "0";
@@ -98,13 +89,11 @@ contract aITuSeModified is ERC20 {
         return string(buffer);
     }
 
-    // Function to retrieve the address of the transaction sender
     function getTransactionSender(uint256 index) public view returns (address) {
         require(index < transactions.length, "Invalid transaction index");
         return transactions[index].sender;
     }
 
-    // Function to retrieve the address of the transaction receiver
     function getTransactionReceiver(uint256 index) public view returns (address) {
         require(index < transactions.length, "Invalid transaction index");
         return transactions[index].receiver;
