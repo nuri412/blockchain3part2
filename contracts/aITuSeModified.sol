@@ -17,10 +17,9 @@ contract aITuSeModified is ERC20 {
 
     event TransferEvent(address indexed sender, address indexed receiver, uint256 amount, uint256 timestamp);
 
-    // Constructor now accepts an input parameter
     constructor(uint256 _initialValue) ERC20("aITuSeModified", "ITSM") {
         initialValue = _initialValue;
-        _mint(msg.sender, _initialValue * 10**decimals()); // Mint tokens based on the initial value
+        _mint(msg.sender, _initialValue * 10**decimals());
     }
 
     function transfer(address recipient, uint256 amount) public override returns (bool) {
@@ -64,56 +63,61 @@ contract aITuSeModified is ERC20 {
     }
 
     function timestampToHumanReadable(uint256 timestamp) internal pure returns (string memory) {
-    // Constants for time calculations
-    uint256 constant SECONDS_PER_DAY = 86400;
-    uint256 constant SECONDS_PER_YEAR = 31536000; // 365 days
-    uint256 constant SECONDS_PER_LEAP_YEAR = 31622400; // 366 days
+        uint256  SECONDS_PER_DAY = 86400;
+        uint256  SECONDS_PER_YEAR = 31536000; 
+        uint256  SECONDS_PER_LEAP_YEAR = 31622400;
+        uint256 year = 1970;
+        uint256 remainingSeconds = timestamp;
+        while (remainingSeconds >= SECONDS_PER_YEAR) {
+            bool isLeapYear = (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0));
+            uint256 secondsInYear = isLeapYear ? SECONDS_PER_LEAP_YEAR : SECONDS_PER_YEAR;
 
-    // Start from the Unix epoch (1970-01-01)
-    uint256 year = 1970;
-    uint256 remainingSeconds = timestamp;
+            if (remainingSeconds < secondsInYear) {
+                break;
+            }
 
-    // Calculate the year
-    while (remainingSeconds >= SECONDS_PER_YEAR) {
-        bool isLeapYear = (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0));
-        uint256 secondsInYear = isLeapYear ? SECONDS_PER_LEAP_YEAR : SECONDS_PER_YEAR;
-
-        if (remainingSeconds < secondsInYear) {
-            break;
+            remainingSeconds -= secondsInYear;
+            year++;
+        }
+        uint8[12] memory monthDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+        if ((year % 4 == 0 && (year % 100 != 0 || year % 400 == 0))) {
+            monthDays[1] = 29; 
         }
 
-        remainingSeconds -= secondsInYear;
-        year++;
-    }
+        uint256 month = 0;
+        uint256 day = 0;
+        for (month = 0; month < 12; month++) {
+            uint256 daysInMonth = monthDays[month];
+            uint256 secondsInMonth = daysInMonth * SECONDS_PER_DAY;
 
-    // Days in each month
-    uint256[12] memory monthDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-    if ((year % 4 == 0 && (year % 100 != 0 || year % 400 == 0))) {
-        monthDays[1] = 29; // February in a leap year
-    }
+            if (remainingSeconds < secondsInMonth) {
+                day = (remainingSeconds / SECONDS_PER_DAY) + 1; 
+                break;
+            }
 
-    // Calculate the month and day
-    uint256 month = 0;
-    uint256 day = 0;
-    for (month = 0; month < 12; month++) {
-        uint256 daysInMonth = monthDays[month];
-        uint256 secondsInMonth = daysInMonth * SECONDS_PER_DAY;
-
-        if (remainingSeconds < secondsInMonth) {
-            day = (remainingSeconds / SECONDS_PER_DAY) + 1; // Day starts at 1
-            break;
+            remainingSeconds -= secondsInMonth;
         }
-
-        remainingSeconds -= secondsInMonth;
+        return string(abi.encodePacked("Y:", uintToString(year)," M:", uintToString(month + 1), " D:", uintToString(day)));
     }
 
-    // Return the formatted string
-    return string(abi.encodePacked(
-        "Y:", uintToString(year),
-        " M:", uintToString(month + 1), // Months are 1-indexed
-        " D:", uintToString(day)
-    ));
-}
+    function uintToString(uint256 value) internal pure returns (string memory) {
+        if (value == 0) {
+            return "0";
+        }
+        uint256 temp = value;
+        uint256 digits;
+        while (temp != 0) {
+            digits++;
+            temp /= 10;
+        }
+        bytes memory buffer = new bytes(digits);
+        while (value != 0) {
+            digits -= 1;
+            buffer[digits] = bytes1(uint8(48 + (value % 10)));
+            value /= 10;
+        }
+        return string(buffer);
+    }
 
     function getTransactionSender(uint256 index) public view returns (address) {
         require(index < transactions.length, "Invalid transaction index");
