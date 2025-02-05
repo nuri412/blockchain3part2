@@ -4,7 +4,7 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract aITuSeModified is ERC20 {
-    uint256 public initialValue; // State variable to store the initial value
+    uint256 public initialValue; 
 
     // Struct to store transaction details
     struct Transaction {
