@@ -4,7 +4,7 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract aITuSe is ERC20 {
-    uint256 public initialValue = 2000; // Initial supply 
+    uint256 public initialValue = 2000; 
 
     // Struct to store transaction details
     struct Transaction {
@@ -22,17 +22,15 @@ contract aITuSe is ERC20 {
 
     // Constructor initializes the token with a fixed initial supply
     constructor() ERC20("aITuSe", "ITS") {
-        _mint(msg.sender, initialValue * 10**decimals()); // Mint 2000 tokens to the deployer
+        _mint(msg.sender, initialValue * 10**decimals()); 
     }
 
-    // Override the transfer function to log transaction details
     function transfer(address recipient, uint256 amount) public override returns (bool) {
         require(recipient != address(0), "ERC20: transfer to the zero address");
         require(amount > 0, "ERC20: transfer amount must be greater than zero");
 
         bool success = super.transfer(recipient, amount);
 
-        // Log the transaction details
         transactions.push(
             Transaction({
                 sender: msg.sender,
@@ -69,15 +67,13 @@ contract aITuSe is ERC20 {
         return timestampToHumanReadable(latestTimestamp);
     }
 
-    // Helper function to convert timestamp to human-readable format
     function timestampToHumanReadable(uint256 timestamp) internal pure returns (string memory) {
-        uint256 year = (timestamp / 31536000) + 1970; // Approximate year calculation
-        uint256 month = (timestamp % 31536000) / 2628000; // Approximate month calculation
-        uint256 day = ((timestamp % 31536000) % 2628000) / 86400; // Approximate day calculation
+        uint256 year = (timestamp / 31536000) + 1970; 
+        uint256 month = (timestamp % 31536000) / 2628000; 
+        uint256 day = ((timestamp % 31536000) % 2628000) / 86400; 
         return string(abi.encodePacked("Y:", uintToString(year), " M:", uintToString(month), " D:", uintToString(day)));
     }
 
-    // Helper function to convert uint to string
     function uintToString(uint256 value) internal pure returns (string memory) {
         if (value == 0) {
             return "0";
